@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Movie` ADD COLUMN `thumbNailPath` VARCHAR(191) NOT NULL DEFAULT '';

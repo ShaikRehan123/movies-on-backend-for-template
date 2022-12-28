@@ -1,0 +1,131 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int          @id @default(autoincrement())
+  name           String?
+  email          String       @unique
+  password       String       @db.LongText
+  isVerified     Boolean      @default(false)
+  isPremium      Boolean      @default(false)
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  subscriptionId Int
+  reviews        Review[]
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  name      String?
+  email     String   @unique
+  password  String   @db.LongText
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Seller {
+  id         Int      @id @default(autoincrement())
+  name       String?
+  email      String   @unique
+  password   String   @db.LongText
+  isVerified Boolean  @default(false)
+  movies     Movie[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  series     Series[]
+}
+
+model Review {
+  id       Int     @id @default(autoincrement())
+  rating   Int     @default(0) @db.TinyInt
+  review   String  @db.LongText
+  Movie    Movie?  @relation(fields: [movieId], references: [id])
+  movieId  Int?
+  Series   Series? @relation(fields: [seriesId], references: [id])
+  seriesId Int?
+  User     User?   @relation(fields: [userId], references: [id])
+  userId   Int?
+}
+
+model Movie {
+  id            Int      @id @default(autoincrement())
+  title         String
+  year          String
+  genre         Genre[]
+  director      String
+  thumbNailPath String   @default("")
+  uploadPath    String   @default("")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  seller        Seller?  @relation(fields: [sellerId], references: [id])
+  reviews       Review[]
+  sellerId      Int?
+}
+
+model Series {
+  id        Int       @id @default(autoincrement())
+  title     String
+  year      String
+  genre     Genre[]
+  director  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  seller    Seller?   @relation(fields: [sellerId], references: [id])
+  sellerId  Int?
+  reviews   Review[]
+  episode   Episode[]
+}
+
+model Genre {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Series    Series[]
+  Movies    Movie[]
+}
+
+model Episode {
+  id        Int      @id @default(autoincrement())
+  title     String
+  year      String
+  genre     String
+  director  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  series    Series?  @relation(fields: [seriesId], references: [id])
+  seriesId  Int?
+}
+
+model Subscription {
+  id           Int           @id @default(autoincrement())
+  subscription SubScriptions
+  payment      Payment?      @relation(fields: [paymentId], references: [id])
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  User         User[]
+  paymentId    Int?
+}
+
+enum SubScriptions {
+  FREE
+  PREMIUM
+}
+
+model Payment {
+  id           Int            @id @default(autoincrement())
+  orderID      String
+  Subscription Subscription[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}

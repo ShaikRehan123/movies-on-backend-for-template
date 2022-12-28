@@ -1,0 +1,12 @@
+node_modules
+# Keep environment variables out of version control
+.env
+dist
+.idea
+.vscode
+yarn.lock
+package-lock.json
+public/uploads
+
+# ds_store
+.DS_Store
